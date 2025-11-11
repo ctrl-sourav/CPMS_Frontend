@@ -3,14 +3,15 @@ import { User, Lock, Bell, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { useContext } from 'react';
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
 
   return (

@@ -12,8 +12,9 @@ import {
   QrCode,
   User
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { useContext } from 'react';
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ interface DashboardSidebarProps {
 }
 
 export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, setIsOpen }) => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   const adminLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },

@@ -1,14 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Activity } from 'lucide-react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useContext(AuthContext);
 
   const navLinks = [
     { name: 'Home', path: '/' },

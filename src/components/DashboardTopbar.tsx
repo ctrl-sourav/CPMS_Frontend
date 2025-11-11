@@ -1,5 +1,5 @@
 import { Bell, Menu, LogOut, Moon, Sun, Settings } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
@@ -12,13 +12,15 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
 
 interface DashboardTopbarProps {
   toggleSidebar: () => void;
 }
 
+
 export const DashboardTopbar: React.FC<DashboardTopbarProps> = ({ toggleSidebar }) => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -41,8 +43,7 @@ export const DashboardTopbar: React.FC<DashboardTopbarProps> = ({ toggleSidebar 
 
         {/* Welcome Message */}
         <div className="hidden md:block">
-          <h2 className="text-lg font-semibold">Welcome back, {user?.name}! 👋</h2>
-          <p className="text-sm text-muted-foreground capitalize">{user?.role} Dashboard</p>
+          <h2 className="text-md font-semibold">Welcome back, <br /> {user?.fullName}! 👋</h2>
         </div>
 
         {/* Right Section */}
@@ -83,11 +84,11 @@ export const DashboardTopbar: React.FC<DashboardTopbarProps> = ({ toggleSidebar 
             <DropdownMenuTrigger asChild>
               <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
                 <Avatar>
-                  <AvatarImage src={user?.avatar} alt={user?.name} />
-                  <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                  <AvatarFallback>{user?.fullName?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">{user?.name}</p>
+                  <p className="text-sm font-medium">{user?.fullName}</p>
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
               </button>

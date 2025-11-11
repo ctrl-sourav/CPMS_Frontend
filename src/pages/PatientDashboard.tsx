@@ -3,11 +3,12 @@ import { Calendar, FileText, User, Activity } from 'lucide-react';
 import { StatCard } from '@/components/StatCard';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { QRCodeDisplay } from '@/components/QRCodeDisplay';
+import { useContext } from 'react';
 
 export default function PatientDashboard() {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   const stats = [
     { title: 'Upcoming Appointments', value: '2', icon: Calendar, trend: 'Next: Tomorrow 10 AM', trendUp: true },
@@ -120,7 +121,7 @@ export default function PatientDashboard() {
             <div className="glass rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 text-center">Your Patient ID</h3>
               <QRCodeDisplay 
-                value={user?.uniqueId || 'PT-1001'} 
+                value={user?._id || 'PT-1001'} 
                 title=""
                 size={150}
               />

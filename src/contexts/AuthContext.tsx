@@ -1,145 +1,114 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 interface User {
-  id: string;
-  name: string;
+  _id: string;
   email: string;
-  role: 'admin' | 'doctor' | 'patient';
-  avatar?: string;
-  specialty?: string;
-  uniqueId?: string;
+  fullName: string;
+  role: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
-  logout: () => void;
   loading: boolean;
+  login: (email: string, password: string, role: string) => Promise<any>;
+  logout: () => void;
+  fetchUser: () => Promise<void>;
 }
 
-interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  role: 'admin' | 'doctor' | 'patient';
-  specialty?: string;
-}
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  isAuthenticated: false,
+  loading: true,
+  login: async () => {},
+  logout: () => {},
+  fetchUser: async () => {},
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const storedUser = localStorage.getItem('cpms_user');
-    const storedToken = localStorage.getItem('cpms_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+  const fetchUser = async () => {
+    const token = localStorage.getItem("CPMS-Auth-token");
+    if (!token) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
-  }, []);
 
-  const login = async (email: string, password: string) => {
+    try{
+      const res = await axios.get(`http://localhost:5000/api/patient/get-patient-details`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUser(res.data.patientInfo || res.data.doctorInfo || res.data.adminInfo);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      localStorage.removeItem("CPMS-Auth-token");
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ useEffect(() => {
+  (async () => {
+    await fetchUser();
+  })();
+}, []);
+
+ // user login
+  const login = async (email: string, password: string, role: string) => {
+
+    const loginPath = role === "doctor" ? "doctorLogin" : role === "admin" ? "adminLogin" : "login";
+
     try {
-      // Mock API call - in real app, this would call the backend
-      const mockUsers = [
-        { 
-          id: '1', 
-          name: 'Admin One', 
-          email: 'admin@cpms.test', 
-          password: 'admin123', 
-          role: 'admin' as const,
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin'
-        },
-        { 
-          id: '2', 
-          name: 'Dr. Rekha Sharma', 
-          email: 'dr.rekha@cpms.test', 
-          password: 'doctor123', 
-          role: 'doctor' as const,
-          specialty: 'Cardiology',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=rekha'
-        },
-        { 
-          id: '3', 
-          name: 'Rahul Kumar', 
-          email: 'rahul@cpms.test', 
-          password: 'patient123', 
-          role: 'patient' as const,
-          uniqueId: 'PT-1001',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=rahul'
-        },
-      ];
+      const res = await axios.post(`http://localhost:5000/api/auth/${loginPath}`, {
+        email,
+        password,
+      });
 
-      const foundUser = mockUsers.find(u => u.email === email && u.password === password);
-      
-      if (!foundUser) {
-        throw new Error('Invalid credentials');
+      if(res.status != 200){
+        return { error: true, message: res.data.message, status: res.status };
       }
 
-      const { password: _, ...userWithoutPassword } = foundUser;
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      
-      localStorage.setItem('cpms_token', mockToken);
-      localStorage.setItem('cpms_user', JSON.stringify(userWithoutPassword));
-      setUser(userWithoutPassword);
-    } catch (error) {
-      throw error;
+      if (res.status === 200){
+        localStorage.setItem("CPMS-Auth-token", res.data.accessToken);
+        setUser(res.data.patientInfo || res.data.doctorInfo || res.data.adminInfo);
+        setIsAuthenticated(true);
+      }
+      return res.data;
+    } catch (err) {
+      console.error("Login failed:", err);
+      return { error: true, message: err.response?.data?.message || "Login failed" };
     }
   };
 
-  const register = async (data: RegisterData) => {
-    try {
-      // Mock registration - in real app, this would call the backend
-      const newUser: User = {
-        id: Date.now().toString(),
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        specialty: data.specialty,
-        uniqueId: data.role === 'patient' ? `PT-${Math.floor(1000 + Math.random() * 9000)}` : undefined,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}`
-      };
-
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      
-      localStorage.setItem('cpms_token', mockToken);
-      localStorage.setItem('cpms_user', JSON.stringify(newUser));
-      setUser(newUser);
-    } catch (error) {
-      throw error;
-    }
-  };
-
+  //user logout
   const logout = () => {
-    localStorage.removeItem('cpms_token');
-    localStorage.removeItem('cpms_user');
+    localStorage.removeItem("CPMS-Auth-token");
     setUser(null);
+    setIsAuthenticated(false);
   };
 
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      login, 
-      register, 
-      logout, 
-      loading 
-    }}>
+   return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        fetchUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+}

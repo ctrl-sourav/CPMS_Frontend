@@ -1,16 +1,18 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
+import { useContext } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: ('admin' | 'doctor' | 'patient')[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  allowedRoles 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles
 }) => {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useContext(AuthContext);
+  console.log("ProtectedRoute - User:", isAuthenticated);
 
   if (loading) {
     return (
@@ -26,7 +28,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  const userRole = user?.role || user?.patientInfo?.role || user?.doctorInfo?.role || user?.adminInfo?.role; 
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center p-8 glass rounded-2xl max-w-md">

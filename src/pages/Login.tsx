@@ -1,20 +1,31 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Activity, Mail, Lock, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
+interface User {
+  id: string;
+  role: string;
+  email: string;
+  fullName: string;
+  login: () => Promise<void>;
+  isAuthenticated: boolean;
+}
+
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated, user } = useContext<User|any>(AuthContext);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,13 +42,28 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
+      const loggedIn = await login(email, password);
       
+      if(loggedIn.status != 200){
+        console.log("Status of user login: ",loggedIn.status);
+        setError(loggedIn.message);
+        toast({
+          title: "Login Failed",
+          description: loggedIn.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if(loggedIn.status === 200){
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+      }
       // Navigate based on role
+      
       const dashboardPath = user?.role === 'admin' ? '/admin' : user?.role === 'doctor' ? '/doctor' : '/patient';
       navigate(dashboardPath);
     } catch (err) {
@@ -76,6 +102,20 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
+
+              <Label htmlFor="role">Role</Label>
+              <div className="relative">
+                <Input
+                  id="role"
+                  type="text"
+                  placeholder="admin, doctor, patient"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -125,6 +165,8 @@ export default function Login() {
             </p>
           </div>
 
+
+        {/* this section to be removed */}
           {/* Demo Credentials */}
           <div className="mt-8 p-4 bg-muted/50 rounded-lg">
             <p className="text-xs font-semibold mb-2 text-center">Demo Credentials:</p>
@@ -134,6 +176,8 @@ export default function Login() {
               <p><strong>Patient:</strong> rahul@cpms.test / patient123</p>
             </div>
           </div>
+        {/* remove upto this */}
+        
         </div>
 
         <div className="text-center mt-6">

@@ -4,10 +4,11 @@ import { ArrowRight, Shield, Clock, Users, BarChart, Activity, Heart, Zap } from
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
+import { useContext } from 'react';
 
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const features = [
     {

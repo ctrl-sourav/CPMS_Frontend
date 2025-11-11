@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Calendar, Heart } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { AuthContext } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { QRCodeDisplay } from '@/components/QRCodeDisplay';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useContext } from 'react';
 
 export default function PatientProfile() {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
 
   return (
     <div className="space-y-6">
