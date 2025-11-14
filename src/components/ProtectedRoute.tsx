@@ -28,7 +28,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  const userRole = user?.role || user?.patientInfo?.role || user?.doctorInfo?.role || user?.adminInfo?.role; 
+  const userRole = user?.role; 
 
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     return (

@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthContext, AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -19,10 +19,15 @@ import ManagePatients from "./pages/ManagePatients";
 import Settings from "./pages/Settings";
 import PatientProfile from "./pages/PatientProfile";
 import NotFound from "./pages/NotFound";
+import BookingPanel from "./components/bookingPanel";
+import { useContext } from "react";
+import PatientHistory from "./pages/PatientHistory";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+
+const App = () => {
+  return (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
@@ -83,6 +88,8 @@ const App = () => (
                 <Route path="reports" element={<PatientDashboard />} />
                 <Route path="appointments" element={<PatientDashboard />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="booking" element={<BookingPanel />} />
+                <Route path="history" element={<PatientHistory />} />
               </Route>
 
               {/* Catch-all route */}
@@ -93,6 +100,7 @@ const App = () => (
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

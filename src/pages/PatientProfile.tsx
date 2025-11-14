@@ -25,12 +25,12 @@ export default function PatientProfile() {
           <div className="glass rounded-xl p-6">
             <div className="flex items-start space-x-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="text-3xl">{user?.name?.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                <AvatarFallback className="text-3xl">{user?.fullName?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-2">{user?.name}</h2>
-                <p className="text-muted-foreground mb-4">Patient ID: {user?.uniqueId}</p>
+                <h2 className="text-2xl font-bold mb-2">{user?.fullName}</h2>
+                <p className="text-muted-foreground mb-4">Patient ID: {user?.id}</p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -38,15 +38,15 @@ export default function PatientProfile() {
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>+91 9999999999</span>
+                    <span>{user?.phone}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>32 years old</span>
+                    <span>{user?.age}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
                     <Heart className="h-4 w-4 text-muted-foreground" />
-                    <span>Blood Group: A+</span>
+                    <span>Blood Group: {user?.bloodGroup}</span>
                   </div>
                 </div>
               </div>
@@ -58,7 +58,6 @@ export default function PatientProfile() {
             <Tabs defaultValue="personal">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="personal">Personal Info</TabsTrigger>
-                <TabsTrigger value="medical">Medical History</TabsTrigger>
                 <TabsTrigger value="emergency">Emergency Contact</TabsTrigger>
               </TabsList>
               
@@ -66,11 +65,7 @@ export default function PatientProfile() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground">Full Name</p>
-                    <p className="font-medium">{user?.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Date of Birth</p>
-                    <p className="font-medium">January 15, 1992</p>
+                    <p className="font-medium">{user?.fullName}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Gender</p>
@@ -78,28 +73,7 @@ export default function PatientProfile() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Address</p>
-                    <p className="font-medium">123 MG Road, Delhi, India</p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="medical" className="space-y-4 mt-4">
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Blood Group</p>
-                    <p className="font-medium">A+</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Allergies</p>
-                    <p className="font-medium">Penicillin</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Chronic Conditions</p>
-                    <p className="font-medium">None</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Current Medications</p>
-                    <p className="font-medium">Aspirin 75mg daily</p>
+                    <p className="font-medium">{user?.address}</p>
                   </div>
                 </div>
               </TabsContent>
@@ -108,11 +82,11 @@ export default function PatientProfile() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground">Contact Name</p>
-                    <p className="font-medium">Priya Kumar</p>
+                    <p className="font-medium">Subham Kumar</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Relationship</p>
-                    <p className="font-medium">Spouse</p>
+                    <p className="font-medium">Friend</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Phone Number</p>
@@ -120,7 +94,7 @@ export default function PatientProfile() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">priya@example.com</p>
+                    <p className="font-medium">subham@example.com</p>
                   </div>
                 </div>
               </TabsContent>
@@ -133,36 +107,12 @@ export default function PatientProfile() {
           <div className="glass rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-4 text-center">Your QR Code</h3>
             <QRCodeDisplay 
-              value={user?.uniqueId || 'PT-1001'} 
+              value={user?.id || 'PT-1001'} 
               title=""
               size={200}
             />
-            <p className="text-xs text-muted-foreground text-center mt-4">
-              Present this QR code to healthcare providers for quick identification and record access
-            </p>
           </div>
 
-          <div className="glass rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Visits</span>
-                <span className="font-semibold">24</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Reports</span>
-                <span className="font-semibold">8</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Prescriptions</span>
-                <span className="font-semibold">12</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Last Visit</span>
-                <span className="font-semibold">Jan 15, 2024</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

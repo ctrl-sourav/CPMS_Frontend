@@ -41,12 +41,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     try{
-      const res = await axios.get(`http://localhost:5000/api/patient/get-patient-details`, {
+      const res = await axios.get(`http://localhost:5000/api/user/details`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setUser(res.data.patientInfo || res.data.doctorInfo || res.data.adminInfo);
+      setUser(res.data.userInfo);
       setIsAuthenticated(true);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -65,30 +65,52 @@ export const AuthProvider = ({ children }) => {
 
  // user login
   const login = async (email: string, password: string, role: string) => {
+  console.log("Login attempt for role:", role);
+  const loginPath = role === 'doctor' 
+    ? 'doctorLogin' 
+    : role === 'admin' 
+    ? 'adminLogin' 
+    : 'login';
 
-    const loginPath = role === "doctor" ? "doctorLogin" : role === "admin" ? "adminLogin" : "login";
+  try {
+    const res = await axios.post(`http://localhost:5000/api/auth/${loginPath}`, {
+      email,
+      password,
+    });
 
-    try {
-      const res = await axios.post(`http://localhost:5000/api/auth/${loginPath}`, {
-        email,
-        password,
-      });
+    // Normalized return
+    if (res.status === 200) {
+      localStorage.setItem("CPMS-Auth-token", res.data.accessToken);
+      const userData = res.data.patientInfo || res.data.doctorInfo || res.data.adminInfo;
 
-      if(res.status != 200){
-        return { error: true, message: res.data.message, status: res.status };
-      }
+      setUser(userData);
+      setIsAuthenticated(true);
 
-      if (res.status === 200){
-        localStorage.setItem("CPMS-Auth-token", res.data.accessToken);
-        setUser(res.data.patientInfo || res.data.doctorInfo || res.data.adminInfo);
-        setIsAuthenticated(true);
-      }
-      return res.data;
-    } catch (err) {
-      console.error("Login failed:", err);
-      return { error: true, message: err.response?.data?.message || "Login failed" };
+      return {
+        success: true,
+        status: 200,
+        user: userData,
+        message: "Login successful",
+      };
     }
-  };
+
+    return {
+      success: false,
+      status: res.status,
+      message: res.data.message || "Login failed",
+    };
+
+  } catch (err) {
+    console.error("Login failed:", err);
+
+    return {
+      success: false,
+      status: err.response?.status || 500,
+      message: err.response?.data?.message || "Login failed",
+    };
+  }
+};
+
 
   //user logout
   const logout = () => {

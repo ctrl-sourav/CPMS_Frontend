@@ -42,8 +42,9 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, setI
   const patientLinks = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/patient' },
     { icon: User, label: 'My Profile', path: '/patient/profile' },
-    { icon: FileText, label: 'Reports', path: '/patient/reports' },
-    { icon: Calendar, label: 'Appointments', path: '/patient/appointments' },
+    { icon: Stethoscope, label: 'My History', path: '/patient/history' },
+    // { icon: FileText, label: 'Reports', path: '/patient/reports' },
+    // { icon: Calendar, label: 'Appointments', path: '/patient/appointments' },
   ];
 
   const getLinks = () => {

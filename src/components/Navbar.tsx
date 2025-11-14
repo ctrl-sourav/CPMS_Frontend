@@ -1,9 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Activity } from 'lucide-react';
-import { useContext, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AuthContext } from '@/contexts/AuthContext';
-import { Button } from './ui/button';
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, Activity } from "lucide-react";
+import { useContext, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AuthContext } from "@/contexts/AuthContext";
+import { Button } from "./ui/button";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,19 +11,23 @@ export const Navbar = () => {
   const { isAuthenticated, user } = useContext(AuthContext);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Features', path: '/#features' },
-    { name: 'About', path: '/#about' },
-    { name: 'Contact', path: '/#contact' },
+    { name: "Home", path: "/" },
+    { name: "Features", path: "/#features" },
+    { name: "About", path: "/#about" },
+    { name: "Contact", path: "/#contact" },
   ];
 
   const getDashboardPath = () => {
-    if (!user) return '/login';
+    if (!user) return "/login";
     switch (user.role) {
-      case 'admin': return '/admin';
-      case 'doctor': return '/doctor';
-      case 'patient': return '/patient';
-      default: return '/';
+      case "admin":
+        return "/admin";
+      case "doctor":
+        return "/doctor";
+      case "patient":
+        return "/patient";
+      default:
+        return "/";
     }
   };
 
@@ -49,9 +53,11 @@ export const Navbar = () => {
                 key={link.path}
                 href={link.path}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
+                  (link.path.startsWith("/#") &&
+                    location.hash === link.path.replace("/", "")) ||
                   location.pathname === link.path
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 }`}
               >
                 {link.name}
@@ -64,18 +70,13 @@ export const Navbar = () => {
             {isAuthenticated ? (
               <Link to={getDashboardPath()}>
                 <Button variant="default" className="shadow-glow">
-                  Dashboard
+                  {user?.role.charAt(0).toUpperCase() + user?.role.slice(1)} Dashboard
                 </Button>
               </Link>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost">Login</Button>
-                </Link>
-                <Link to="/register">
-                  <Button variant="default" className="shadow-glow">
-                    Register
-                  </Button>
+                  <Button variant="default">Login</Button>
                 </Link>
               </>
             )}
@@ -97,7 +98,7 @@ export const Navbar = () => {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-t border-border/50"
           >
@@ -114,7 +115,10 @@ export const Navbar = () => {
               ))}
               <div className="pt-4 border-t border-border space-y-2">
                 {isAuthenticated ? (
-                  <Link to={getDashboardPath()} onClick={() => setIsOpen(false)}>
+                  <Link
+                    to={getDashboardPath()}
+                    onClick={() => setIsOpen(false)}
+                  >
                     <Button variant="default" className="w-full">
                       Dashboard
                     </Button>
